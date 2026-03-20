@@ -8,8 +8,34 @@ export const createClient = () => {
     if (typeof window === 'undefined') {
       console.warn('Supabase URL or Key missing during server-side execution.')
     }
-    // Return a dummy client or handle it in the UI
-    return {} as any
+    
+    // Return a robust mock to prevent crashes in the UI
+    const mockAuth = {
+      onAuthStateChange: (cb: any) => {
+        // Immediately trigger with null session if needed, or just return unsubscribe
+        return { data: { subscription: { unsubscribe: () => {} } } }
+      },
+      signInWithPassword: async () => ({ error: { message: 'Supabase not configured' } }),
+      signInWithOAuth: async () => ({ error: { message: 'Supabase not configured' } }),
+      signUp: async () => ({ error: { message: 'Supabase not configured' } }),
+      getUser: async () => ({ data: { user: null }, error: null }),
+      getSession: async () => ({ data: { session: null }, error: null }),
+      signOut: async () => ({ error: null }),
+    }
+
+    return { 
+      auth: mockAuth,
+      from: () => ({
+        select: () => ({
+          order: () => ({
+            limit: () => Promise.resolve({ data: [], error: null })
+          }),
+          eq: () => ({
+            single: () => Promise.resolve({ data: null, error: null })
+          })
+        })
+      })
+    } as any
   }
 
   return createBrowserClient(url, key)

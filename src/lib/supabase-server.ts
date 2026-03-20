@@ -7,7 +7,28 @@ export function createClient() {
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
   if (!url || !key) {
-    return {} as any
+    const mockAuth = {
+      onAuthStateChange: (cb: any) => ({ data: { subscription: { unsubscribe: () => {} } } }),
+      signInWithPassword: async () => ({ error: { message: 'Supabase not configured' } }),
+      signInWithOAuth: async () => ({ error: { message: 'Supabase not configured' } }),
+      signUp: async () => ({ error: { message: 'Supabase not configured' } }),
+      getUser: async () => ({ data: { user: null }, error: null }),
+      getSession: async () => ({ data: { session: null }, error: null }),
+      signOut: async () => ({ error: null }),
+    }
+    return { 
+      auth: mockAuth,
+      from: () => ({
+        select: () => ({
+          order: () => ({
+            limit: () => Promise.resolve({ data: [], error: null })
+          }),
+          eq: () => ({
+            single: () => Promise.resolve({ data: null, error: null })
+          })
+        })
+      })
+    } as any
   }
 
   return createServerClient(
