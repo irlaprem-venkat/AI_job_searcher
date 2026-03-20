@@ -1,12 +1,12 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { useSearchParams } from 'next/navigation'
 import { Github, Mail, Sparkles, Loader2, Lock, UserPlus, LogIn } from 'lucide-react'
 
-export default function LoginPage() {
+function LoginPageContent() {
   const searchParams = useSearchParams()
   const [isLoading, setIsLoading] = useState<string | null>(null)
   const [mode, setMode] = useState<'login' | 'signup'>('login')
@@ -205,5 +205,17 @@ export default function LoginPage() {
         </button>
       </motion.div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-black">
+        <Loader2 className="animate-spin text-neon-cyan" size={48} />
+      </div>
+    }>
+      <LoginPageContent />
+    </Suspense>
   )
 }
