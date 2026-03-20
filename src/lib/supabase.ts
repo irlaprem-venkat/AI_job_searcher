@@ -5,6 +5,13 @@ export const createClient = () => {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   
+  if (typeof window !== 'undefined') {
+    console.log('Supabase Configuration Check:', {
+      urlPresent: !!url,
+      keyPresent: !!key,
+    })
+  }
+
   if (!url || !key) {
     if (typeof window === 'undefined') {
       console.warn('Supabase URL or Key missing during server-side execution.')
