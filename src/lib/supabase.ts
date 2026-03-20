@@ -1,3 +1,4 @@
+/** Supabase configuration and client initialization with resilience for build-time environments. */
 import { createBrowserClient } from '@supabase/ssr'
 
 export const createClient = () => {
