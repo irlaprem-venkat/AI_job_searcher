@@ -28,10 +28,7 @@ export async function GET(request: Request) {
     )
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      const isLocalEnv = process.env.NODE_ENV === 'development'
-      if (isLocalEnv) {
-        return NextResponse.redirect(`${origin}${next}`)
-      }
+      // Use the origin from the request to ensure we stay on the same domain
       return NextResponse.redirect(`${origin}${next}`)
     }
   }

@@ -34,10 +34,17 @@ function LoginPageContent() {
   const handleOAuthLogin = async (provider: 'google' | 'github') => {
     setIsLoading(provider)
     setError(null)
+    const redirectTo = `${window.location.origin}/auth/callback`
+    console.log('Initiating OAuth Login:', { provider, redirectTo })
+    
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
       },
     })
     if (error) {
