@@ -41,10 +41,6 @@ function LoginPageContent() {
       provider,
       options: {
         redirectTo,
-        queryParams: {
-          access_type: 'offline',
-          prompt: 'consent',
-        },
       },
     })
     if (error) {
