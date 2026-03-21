@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS profiles (
   id uuid REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
   full_name text,
   email text UNIQUE,
+  phone text, -- Added for auto form filling
   resume_url text,
   skills text[],
   experience_years int,
@@ -30,12 +31,38 @@ CREATE TABLE IF NOT EXISTS jobs (
   created_at timestamp with time zone DEFAULT now()
 );
 
+-- Job Preferences Table
+CREATE TABLE IF NOT EXISTS job_preferences (
+  id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE UNIQUE,
+  desired_salary text,
+  locations text[],
+  job_types text[],
+  experience_level text,
+  auto_apply_enabled boolean DEFAULT false,
+  created_at timestamp with time zone DEFAULT now()
+);
+
+-- Saved Jobs Table (Jobs queued or matched for user)
+CREATE TABLE IF NOT EXISTS saved_jobs (
+  id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
+  job_id uuid REFERENCES jobs(id) ON DELETE CASCADE,
+  match_score numeric,
+  platform text,
+  status text DEFAULT 'queued' CHECK (status IN ('queued', 'applying', 'applied', 'failed')),
+  created_at timestamp with time zone DEFAULT now()
+);
+
 -- Applications Table
 CREATE TABLE IF NOT EXISTS applications (
   id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
   job_id uuid REFERENCES jobs(id) ON DELETE CASCADE,
   user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
   status text DEFAULT 'pending' CHECK (status IN ('pending', 'reviewed', 'accepted', 'rejected')),
+  cover_letter_text text,
+  applied_platform text,
+  applied_at timestamp with time zone,
   created_at timestamp with time zone DEFAULT now()
 );
 
