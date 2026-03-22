@@ -28,13 +28,12 @@ export async function GET(request: Request) {
     )
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      // Prioritize the request origin, but ensure we don't redirect to localhost in production
-      const isProduction = process.env.NODE_ENV === 'production'
-      const redirectUrl = isProduction && origin.includes('localhost') 
-        ? `https://ai-job-searcher-pj4m.vercel.app${next}`
-        : `${origin}${next}`
-        
-      return NextResponse.redirect(redirectUrl)
+      // Use NEXT_PUBLIC_SITE_URL in production to avoid localhost redirects
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
+      const isLocalhost = origin.includes('localhost') || origin.includes('127.0.0.1')
+      const baseUrl = (siteUrl && isLocalhost) ? siteUrl : origin
+
+      return NextResponse.redirect(`${baseUrl}${next}`)
     }
   }
 
